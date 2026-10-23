@@ -1,9 +1,11 @@
 """จุดเริ่มของเว็บ: ตั้งค่าหน้า ธีม และแถบเมนูด้านบน แล้วเรียกหน้าที่เลือก"""
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
 
-st.set_page_config(page_title="Quake Monitor", page_icon="◉", layout="wide",
-                   initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Quake Monitor", page_icon=str(Path(__file__).parent / "static" / "logo.png"),
+                   layout="wide", initial_sidebar_state="collapsed")
 
 from db import query  # noqa: E402  (ต้องเรียก set_page_config ก่อน)
 from theme import apply_theme, footer, top_nav  # noqa: E402

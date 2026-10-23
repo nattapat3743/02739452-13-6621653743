@@ -8,10 +8,12 @@
   card()         การ์ดครอบข้อมูลแต่ละชุด (หัวการ์ด + เนื้อหา)
   footer()
 """
+import base64
 import hashlib
 import math
 from contextlib import contextmanager
 from html import escape
+from pathlib import Path
 
 import plotly.graph_objects as go
 import plotly.io as pio
@@ -83,9 +85,7 @@ a {{ color: {C['accent']}; }}
 .st-key-topnav [data-testid="stColumn"] {{ flex: 0 0 auto !important; width: auto !important; min-width: 0 !important; }}
 .st-key-topnav [data-testid="stColumn"]:first-child {{ flex: 1 1 auto !important; overflow-x: clip; overflow-y: visible; }}
 .brand {{ display: flex; align-items: center; gap: 12px; white-space: nowrap; }}
-.brand .mark {{ flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: {C['accent']};
-    position: relative; box-shadow: inset 0 0 0 5px {C['canvas']}, 0 0 0 2px {C['accent']}; }}
-.brand .mark::after {{ content: ""; position: absolute; inset: 14px; border-radius: 50%; background: {C['canvas']}; }}
+.brand .logo {{ flex-shrink: 0; width: 46px; height: 46px; display: block; }}
 .brand .text {{ display: flex; flex-direction: column; line-height: 1.25; }}
 .brand .text strong {{ font-size: 18px; font-weight: 800; color: {C['house']}; }}
 .brand .text small {{ font-size: 12.5px; color: {C['muted']}; font-weight: 600; }}
@@ -400,11 +400,19 @@ def apply_theme():
     st.markdown(CSS, unsafe_allow_html=True)
 
 
+LOGO_FILE = Path(__file__).parent / "static" / "logo.png"
+
+
+@st.cache_resource
+def logo_data_uri() -> str:
+    return "data:image/png;base64," + base64.b64encode(LOGO_FILE.read_bytes()).decode()
+
+
 def top_nav(pages: list, current, freshness: str = ""):
     """แถบบนเต็มความกว้าง: โลโก้ + เวลาอัปเดตล่าสุดซ้าย, เมนูหน้าขวา (หน้าปัจจุบันเป็นแคปซูลสีเขียว)"""
     with st.container(key="topnav"):
         cols = st.columns([4.2] + [1.25] * (len(pages) + 1), vertical_alignment="center")
-        cols[0].markdown("<div class='brand'><span class='mark'></span><span class='text'>"
+        cols[0].markdown(f"<div class='brand'><img class='logo' src='{logo_data_uri()}' alt=''><span class='text'>"
                          "<strong>Quake Monitor</strong>"
                          f"<small>{escape(freshness) or 'แผ่นดินไหวในไทยและประเทศเพื่อนบ้าน'}</small></span></div>",
                          unsafe_allow_html=True)
