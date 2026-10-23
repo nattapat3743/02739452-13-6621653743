@@ -24,6 +24,18 @@ def query(sql: str, **params) -> pd.DataFrame:
         return pd.read_sql(text(sql), conn, params=params)
 
 
+def has_rows(table: str) -> bool:
+    """ตารางมีอยู่และมีข้อมูลแล้วหรือยัง
+
+    ไม่ cache: ระหว่างรอ DAG รอบแรก คำตอบเปลี่ยนจาก False เป็น True ได้ทุกเมื่อ
+    ถ้า cache ไว้ เว็บจะยังขึ้น "ยังไม่มีข้อมูล" ต่ออีกถึง 60 วินาทีหลังข้อมูลเข้าแล้ว
+    """
+    assert table in {"earthquakes", "pipeline_runs"}, table  # ชื่อตารางมาจากโค้ดเท่านั้น
+    with get_engine().connect() as conn:
+        if not conn.execute(text("SELECT to_regclass(:t) IS NOT NULL"), {"t": f"public.{table}"}).scalar():
+            return False
+        return bool(conn.execute(text(f"SELECT EXISTS (SELECT 1 FROM {table})")).scalar())
+
+
 def tables_ready() -> bool:
-    df = query("SELECT to_regclass('public.earthquakes') IS NOT NULL AS ok")
-    return bool(df["ok"].iloc[0])
+    return has_rows("earthquakes")

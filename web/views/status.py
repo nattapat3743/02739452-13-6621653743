@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from db import query
+from db import has_rows, query
 from theme import (SOURCE_COLORS, badge, card, chart, flow, page_header, paged_dataframe, section,
                    stat_strip)
 
@@ -11,8 +11,7 @@ SOURCE_NAMES = {"TMD": "กรมอุตุนิยมวิทยา", "USGS
 STATUS_TEXT = {"SUCCESS": "สำเร็จ", "PARTIAL": "บางแหล่งล่ม", "QUALITY_FAILED": "คุณภาพไม่ผ่าน",
                "FAILED": "ล้มเหลว"}
 
-ready = query("SELECT to_regclass('public.pipeline_runs') IS NOT NULL AS ok")["ok"].iloc[0]
-runs = query("SELECT * FROM pipeline_runs ORDER BY finished_at DESC") if ready else pd.DataFrame()
+runs = query("SELECT * FROM pipeline_runs ORDER BY finished_at DESC") if has_rows("pipeline_runs") else pd.DataFrame()
 if runs.empty:
     page_header("Data pipeline · Apache Airflow", "ระบบนี้ทำงานยังไง")
     st.info("ยังไม่มีประวัติการรัน DAG")
