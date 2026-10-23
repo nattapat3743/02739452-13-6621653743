@@ -1,0 +1,4 @@
+# แพ็กเกจเพิ่มเติมสำหรับ DAG (ติดตั้งลงอิมเมจ Airflow ผ่าน Dockerfile.airflow)
+# requests, psycopg2 และ apache-airflow-providers-postgres มีในอิมเมจ apache/airflow:2.10.5 อยู่แล้ว
+beautifulsoup4==4.12.3
+# แพ็กเกจของเว็บ dashboard อยู่ใน web/requirements.txt
